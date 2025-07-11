@@ -13,7 +13,7 @@ ensuring best practices for data representation.
 1. **Download a Template:**
 
 Download your desired template into your OpenTelemetry Collector configuration
-directory (e.g., /etc/otelcol-contrib on Linux):
+directory (e.g., `/etc/otelcol-contrib` on Linux):
 
 ```shell
 wget https://raw.githubusercontent.com/CentreonLabs/centreon-otel-col-log-template/refs/heads/main/myfile.yaml -O /etc/otelcol-contrib/myfile.yaml
