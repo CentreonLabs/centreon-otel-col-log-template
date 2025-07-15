@@ -1,7 +1,7 @@
 # Copyright 2025 Centreon.
 # SPDX-License-Identifier: 	AGPL-3.0-or-later
 
-eceivers:
+receivers:
   filelog/centreon-web:
     include:
       - /var/log/centreon/centreon-web.log
