@@ -1,0 +1,81 @@
+# Copyright 2025 Centreon.
+# SPDX-License-Identifier: 	AGPL-3.0-or-later
+
+eceivers:
+  filelog/centreon-web:
+    include:
+      - /var/log/centreon/centreon-web.log
+    operators:
+      - type: regex_parser
+        regex: '^\[((?P<ts1>\d{4}-\d{2}-\d{2}T\d{2}:\d{2}:\d{2}\+\d{2}:\d{2})|(?P<ts2>\d{4}-\d{2}-\d{2}T\d{2}:\d{2}:\d{2}\+\d{4}))]\s+(?P<unparsed>.*)$'
+      - type: time_parser
+        parse_from: attributes["ts1"]
+        layout: '%Y-%m-%dT%H:%M:%S%j'
+        if: "attributes['ts1'] != ''"
+      - type: time_parser
+        parse_from: attributes["ts2"]
+        layout: '%Y-%m-%dT%H:%M:%S%z'
+        if: "attributes['ts2'] != ''"
+      - type: regex_parser
+        parse_from: attributes["unparsed"]
+        regex: '^\[(?P<level>\w+)\]\s\[(?<funtionname>[^:]+):(?P<line>\d+)\]:\s(?P<body>.*)\s{"context":.*$'
+        if: "attributes['ts2'] != ''"
+      - type: regex_parser
+        parse_from: attributes["unparsed"]
+        regex: '^(?P<level>\w+)\s:\s(?P<body>[^|]+)\s\|\s(?P<contextstr>.*)$'
+        if: "attributes['ts1'] != ''"
+      - type: json_parser
+        parse_from: attributes["contextstr"]
+        parse_to: attributes["context"]
+        if: '"contextstr" in attributes && attributes["contextstr"] != ""'
+      - type: severity_parser
+        parse_from: attributes["level"]
+      - type: move
+        from: attributes["body"]
+        to: body
+      # Add a service version, the template version
+      - type: add
+        field: resource["service.version"]
+        value: '1.0.0'
+      # Add the service name
+      - type: add
+        field: resource["service.name"]
+        value: 'centreon-web'
+      # The log emit information
+      - type: move
+        from: attributes["funtionname"]
+        to: attributes["code.function.name"]
+        if: '"funtionname" in attributes'
+      - type: move
+        from: attributes["line"]
+        to: attributes["code.line.number"]
+        if: '"line" in attributes'
+      - type: copy
+        from: attributes["context"]["context"]["default"]["back_trace"]["line"]
+        to: attributes["code.line.number"]
+        if: '"context" in attributes'
+      - type: copy
+        from: attributes["context"]["context"]["default"]["back_trace"]["file"]
+        to: attributes["code.file.path"]
+        if: '"context" in attributes'
+      - type: remove
+        field: attributes["level"]
+      - type: remove
+        field: attributes["ts1"]
+      - type: remove
+        field: attributes["ts2"]
+      - type: remove
+        field: attributes["context"]
+        if: '"context" in attributes'
+      - type: remove
+        field: attributes["unparsed"]
+      - type: remove
+        field: attributes["contextstr"]
+        if: '"contextstr" in attributes'
+
+service:
+  pipelines:
+    logs:
+      receivers: [filelog/centreon-web]
+      processors: [batch,resourcedetection]
+      exporters: [otlphttp/centreon]

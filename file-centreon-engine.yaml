@@ -1,0 +1,63 @@
+# Copyright 2025 Centreon.
+# SPDX-License-Identifier: 	AGPL-3.0-or-later
+
+receivers:
+  filelog/centreon-engine:
+    include:
+      - /var/log/centreon-engine/*.log
+    include_file_path: true
+    operators:
+      - type: regex_parser
+        regex: '^\[((?P<ts>\d{4}-\d{2}-\d{2}T\d{2}:\d{2}:\d{2}.\d{3}\+\d{2}:\d{2})|(?P<uts>\d+))\]\s(?P<unparsed>.*)$'
+      - type: time_parser
+        parse_from: attributes["ts"]
+        layout: '%Y-%m-%dT%H:%M:%S.%L%j'
+        if: 'attributes.ts != ""'
+      - type: time_parser
+        parse_from: attributes["uts"]
+        layout: 's'
+        layout_type: epoch
+        if: 'attributes.uts != ""'
+      - type: regex_parser
+        parse_from: attributes["unparsed"]
+        regex: '^\[(?P<pid>\d+)\]\s(?P<body>.*)$'
+        if: 'attributes.uts != ""'
+      - type: regex_parser
+        parse_from: attributes["unparsed"]
+        regex: '^\[(?P<component>[^]]+)\]\s\[(?P<level>[^]]+)\]\s\[(?P<pid>\d+)\]\s(?P<body>.*)$'
+        if: 'attributes.ts != ""'
+      - type: move
+        from: attributes["body"]
+        to: body
+      # Add a service version, the template version
+      - type: add
+        field: resource["service.version"]
+        value: '1.0.0'
+      # Add the service name
+      - type: add
+        field: resource["service.name"]
+        value: 'centreon-engine'
+      # The process ID
+      - type: move
+        from: attributes["pid"]
+        to: attributes["process.pid"]
+        if: 'attributes.pid != ""'
+      - type: severity_parser
+        parse_from: attributes["level"]
+        if: '"level" in attributes'
+      - type: remove
+        field: attributes["unparsed"]
+      - type: remove
+        field: attributes["ts"]
+      - type: remove
+        field: attributes["uts"]
+      - type: remove
+        field: attributes["level"]
+        if: '"level" in attributes'
+
+service:
+  pipelines:
+    logs:
+      receivers: [filelog/centreon-engine]
+      processors: [batch,resourcedetection]
+      exporters: [otlphttp/centreon]

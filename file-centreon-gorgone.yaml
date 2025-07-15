@@ -1,0 +1,38 @@
+# Copyright 2025 Centreon.
+# SPDX-License-Identifier: 	AGPL-3.0-or-later
+
+receivers:
+  filelog/centreon-gorgone:
+    include:
+      - /var/log/centreon-gorgone/*.log
+    include_file_path: true
+    operators:
+      - type: regex_parser
+        regex: '^(?P<ts>\d{4}-\d{2}-\d{2}\s\d{2}:\d{2}:\d{2})\s-\s(?P<level>\w+)\s-\s\[(?P<component>[\w_-]+)\]\s-class-\s(?P<class>[\w_ ]+)\s-\s(?P<body>.*)$'
+        timestamp:
+          parse_from: attributes.ts
+          layout: '%Y-%m-%d %H:%M:%S'
+        severity:
+          parse_from: attributes.level
+      - type: move
+        from: attributes["body"]
+        to: body
+      # Add a service version, the template version
+      - type: add
+        field: resource["service.version"]
+        value: '1.0.0'
+      # Add the service name
+      - type: add
+        field: resource["service.name"]
+        value: 'centreon-gorgone'
+      - type: remove
+        field: attributes["level"]
+      - type: remove
+        field: attributes["ts"]
+
+service:
+  pipelines:
+    logs:
+      receivers: [filelog/centreon-gorgone]
+      processors: [batch,resourcedetection]
+      exporters: [otlphttp/centreon]
