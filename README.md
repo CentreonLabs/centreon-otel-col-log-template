@@ -76,7 +76,7 @@ service:
 
 ### MariaDB
 
-* [MariaDB](file-mariadb.yaml): The log files of MaraDB.
+* [MariaDB](file-mariadb.yaml): The log files of MariaDB.
 
 ### Message / Syslog
 
