@@ -1,0 +1,43 @@
+# Copyright 2025-Present Centreon.
+# SPDX-License-Identifier: 	AGPL-3.0-or-later
+
+receivers:
+  filelog/mariadb:
+    include:
+      - /var/log/mariadb/*.log
+    include_file_path: true
+    operators:
+      - type: regex_parser
+        regex: '^(?P<ts>\d{4}-\d{2}-\d{1,2}\s+\d{1,2}:\d{2}:\d{2})\s+\d+\s+\[(?P<level>\w+)\]\s+(?P<body>.*)$'
+        timestamp:
+          parse_from: attributes.ts
+          layout: '%Y-%m-%d %H:%M:%S'
+        severity:
+          parse_from: attributes.level
+          mapping:
+            error: Error
+            warn: Warning
+            info: Notice
+          overwrite_text: true
+      - type: move
+        from: attributes["body"]
+        to: body
+      # Add a service version, the template version
+      - type: add
+        field: resource["service.version"]
+        value: '1.0.0'
+      # Add the service name
+      - type: add
+        field: resource["service.name"]
+        value: 'mariadb'
+      - type: remove
+        field: attributes["level"]
+      - type: remove
+        field: attributes["ts"]
+
+service:
+  pipelines:
+    logs:
+      receivers: [filelog/mariadb]
+      processors: [batch,resourcedetection]
+      exporters: [otlphttp/centreon]

@@ -58,3 +58,30 @@ service:
 ```
 
 ## List of templates
+
+### Apache
+
+* [Apache error](file-apache-error.yaml): The log errors of apache.
+
+### Centreon
+
+* [Centreon Broker](file-centreon-broker.yaml): The log file of Centreon Broker.
+* [Centreon Engine](file-centreon-engine.yaml): The log file of Centreon Engine.
+* [Centreon Gorgone](file-centreon-gorgone.yaml): The log file of Centreon Gorgone.
+* [Centreon Web](file-centreon-web.yaml): The log file of Centreon Web.
+
+### HTTP
+
+* [Access Log Combibed](file-httpd-combined.yaml): The http access log in combined format.
+
+### MariaDB
+
+* [MariaDB](file-mariadb.yaml): The log files of MariaDB.
+
+### Message / Syslog
+
+* [Linux messages](file-message.yaml): The syslog system log file.
+
+### Tomcat
+
+* [Tomcat](file-tomcat.yaml): The Tomcat log file.

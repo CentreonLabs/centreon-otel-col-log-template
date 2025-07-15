@@ -1,0 +1,62 @@
+# Copyright 2025-Present Centreon.
+# SPDX-License-Identifier: 	AGPL-3.0-or-later
+
+receivers:
+  filelog/apache-error:
+    include:
+      - /var/log/httpd/error_log
+    include_file_path: true
+    operators:
+      - type: regex_parser
+        regex: '^\[(?P<ts>\w{3}\s\w{3}\s\d{2}\s\d{2}:\d{2}:\d{2}\.\d{6}\s\d{4})\]\s\[(?P<component>\w+):(?P<level>\w+)\]\s\[pid\s(?P<pid>\d+):tid\s\d+\]\s(?P<apachecode>AH\d{5}):\s(?P<body>.*)$'
+        timestamp:
+          parse_from: attributes.ts
+          layout: '%a %b %d %H:%M:%S.%f %Y'
+        serverity:
+          parse_from: attributes.level
+          mapping:
+            trace:
+              - trace1
+              - trace2
+              - trace3
+              - trace4
+              - trace5
+              - trace6
+              - trace7
+              - trace8
+            debug: debug
+            info:
+              - info
+              - notice
+            warn: warn
+            error:
+              - error
+              - crit
+            fatal:
+              - alert
+              - emerg
+          overwrite_text: true
+      - type: move
+        from: attributes["body"]
+        to: body
+      # The apache process
+      - type: move
+        from: attributes["pid"]
+        to: attributes["process.pid"]
+      # Add a service version, the template version
+      - type: add
+        field: resource["service.version"]
+        value: '1.0.0'
+      # Add the service name
+      - type: add
+        field: resource["service.name"]
+        value: 'apache'
+      - type: remove
+        field: attributes["ts"]
+
+service:
+  pipelines:
+    logs:
+      receivers: [filelog/apache-error]
+      processors: [batch,resourcedetection]
+      exporters: [otlphttp/centreon]

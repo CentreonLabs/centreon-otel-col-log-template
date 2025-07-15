@@ -1,0 +1,39 @@
+# Copyright 2025-Present Centreon.
+# SPDX-License-Identifier: 	AGPL-3.0-or-later
+
+receivers:
+  filelog/messages:
+    include:
+      - /var/log/messages
+    include_file_path: true
+    operators:
+      - type: regex_parser
+        regex: '^(?P<ts>\w{3}\s\d{2}\s\d{2}:\d{2}:\d{2})\s(?P<hostname>[\w_-]+)\s(?P<process>[\w_-]+)(\[(?<pid>\d+)\])?:\s(?<body>.*)$'
+        timestamp:
+          parse_from: attributes["ts"]
+          layout: '%b %d %H:%M:%S'
+      - type: move
+        from: attributes["pid"]
+        to: attributes["process.pid"]
+      - type: move
+        from: attributes["process"]
+        to: resource["service.name"]
+      - type: remove
+        field: attributes["ts"]
+      - type: move
+        from: attributes["body"]
+        to: body
+      # Add a service version, the template version
+      - type: add
+        field: resource["service.version"]
+        value: '1.0.0'
+      # Remove the hostname, use the resource detectors
+      - type: remove
+        field: attributes["hostname"]
+
+service:
+  pipelines:
+    logs/file-messages:
+      receivers: [filelog/messages]
+      processors: [batch,resourcedetection]
+      exporters: [otlphttp/centreon]
