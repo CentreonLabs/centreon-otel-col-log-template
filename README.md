@@ -72,7 +72,7 @@ service:
 
 ### HTTP
 
-* [Access Log Combibed](file-httpd-combined.yaml): The http access log in combined format.
+* [Access Log Combined](file-httpd-combined.yaml): The http access log in combined format.
 
 ### MariaDB
 
