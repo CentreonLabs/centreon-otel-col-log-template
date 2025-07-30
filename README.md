@@ -90,3 +90,8 @@ service:
 
 * [PostgreSQL base](file-postgres-base.yaml): The basic PostgreSQL log file. Log
   prefix: `%m [%p] `.
+
+### Windows Event Log
+
+* [Windows Event Log](windows-event-log.yaml): Contains the event log
+  application parsing with locale US and FR for level conversions.

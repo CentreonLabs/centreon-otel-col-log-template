@@ -1,0 +1,61 @@
+# Copyright 2025-Present Centreon.
+# SPDX-License-Identifier: 	AGPL-3.0-or-later
+
+receivers:
+  windowseventlog/application:
+    channel: application
+    operators:
+      - type: severity_parser
+        parse_from: body.level
+        overwrite_text: true
+        mapping:
+          fatal:
+            - Critical
+            - Critique
+          error:
+            - Error
+            - Erreur
+          warn:
+            - Warning
+            - Avertissement
+          info:
+            - Informational
+            - Information
+      - type: copy
+        from: body.execution.process_id
+        to: attributes["process.pid"]
+      - type: copy
+        from: body.provider.name
+        to: resource["event.provider.name"]
+      - type: copy
+        from: body.provider.guid
+        to: resource["event.provider.guid"]
+        if: "body.provider.guid != ''"
+      - type: copy
+        from: body.event_id.id
+        to: attributes["event.id"]
+      - type: copy
+        from: body.record_id
+        to: attributes["event.record.id"]
+      - type: copy
+        from: body.task
+        to: attributes["event.task"]
+      - type: move
+        from: body.message
+        to: body
+      - type: add
+        field: resource["service.version"]
+        value: "1.0.0"
+      - type: add
+        field: resource["service.name"]
+        value: "windows-event-log"
+      - type: add
+        field: resource["service.namespace"]
+        value: "application"
+
+service:
+  pipelines:
+    logs:
+      receivers: [windowseventlog/application]
+      processors: [batch, resourcedetection]
+      exporters: [otlphttp/centreon]
