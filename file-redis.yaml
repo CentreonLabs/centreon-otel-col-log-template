@@ -1,0 +1,70 @@
+# Copyright 2025-Present Centreon.
+# SPDX-License-Identifier: 	AGPL-3.0-or-later
+
+receivers:
+  filelog/redis:
+    include:
+      - /var/log/redis/redis-server.log
+    include_file_path: true
+    start_at: beginning
+    operators:
+      - type: regex_parser
+        regex: '^(?P<pid>\d+):(?P<role>X|C|S|M)\s+(?P<ts>\d{2}\s\w{3}\s\d{4}\s\d{2}:\d{2}:\d{2}.\d{3})\s+(?P<level>[\*|\.|#|-])\s+((?P<component><\w+>)\s+)?(?P<body>.*)'
+        timestamp:
+          parse_from: attributes.ts
+          layout: "%d %b %Y %H:%M:%S.%f"
+        severity:
+          parse_from: attributes.level
+          overwrite_text: true
+          mapping:
+            debug:
+              - "."
+            info:
+              - "*"
+              - "-"
+            warn:
+              - "#"
+      - type: move
+        from: attributes["pid"]
+        to: attributes["process.pid"]
+      - type: move
+        from: attributes["body"]
+        to: body
+      - type: regex_replace
+        regex: "^X$"
+        replace_with: sentinel
+        field: attributes.role
+      - type: regex_replace
+        regex: "^C$"
+        replace_with: child
+        field: attributes.role
+      - type: regex_replace
+        regex: "^M$"
+        replace_with: master
+        field: attributes.role
+      - type: regex_replace
+        regex: "^S$"
+        replace_with: slave
+        field: attributes.role
+      # Add a service version, the template version
+      - type: add
+        field: resource["service.version"]
+        value: "1.0.0"
+      # Add the service name
+      - type: add
+        field: resource["service.name"]
+        value: "redis"
+      - type: remove
+        field: attributes["ts"]
+      - type: remove
+        field: attributes["level"]
+      - type: remove
+        field: attributes["component"]
+        if: "attributes['component'] == ''"
+
+service:
+  pipelines:
+    logs:
+      receivers: [filelog/redis]
+      processors: [batch, resourcedetection]
+      exporters: [otlphttp/centreon]
