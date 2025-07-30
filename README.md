@@ -85,3 +85,8 @@ service:
 ### Tomcat
 
 * [Tomcat](file-tomcat.yaml): The Tomcat log file.
+
+### PostgreSQL
+
+* [PostgreSQL base](file-postgres-base.yaml): The basic PostgreSQL log file. Log
+  prefix: `%m [%p] `.
