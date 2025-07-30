@@ -91,6 +91,10 @@ service:
 * [PostgreSQL base](file-postgres-base.yaml): The basic PostgreSQL log file. Log
   prefix: `%m [%p] `.
 
+### Redis
+
+* [Redis](file-redis.yaml): Redis log file, with paring role, component, level.
+
 ### Windows Event Log
 
 * [Windows Event Log](windows-event-log.yaml): Contains the event log
