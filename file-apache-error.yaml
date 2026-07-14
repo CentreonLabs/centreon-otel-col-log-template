@@ -1,5 +1,5 @@
 # Copyright 2025-Present Centreon.
-# SPDX-License-Identifier: 	AGPL-3.0-or-later
+# SPDX-License-Identifier: AGPL-3.0-or-later
 
 receivers:
   filelog/apache-error:
@@ -12,7 +12,7 @@ receivers:
         timestamp:
           parse_from: attributes.ts
           layout: '%a %b %d %H:%M:%S.%f %Y'
-        serverity:
+        severity:
           parse_from: attributes.level
           mapping:
             trace:
@@ -53,10 +53,12 @@ receivers:
         value: 'apache'
       - type: remove
         field: attributes["ts"]
+      - type: remove
+        field: attributes["level"]
 
 service:
   pipelines:
-    logs:
+    logs/apache-error:
       receivers: [filelog/apache-error]
-      processors: [batch,resourcedetection]
+      processors: [memory_limiter, resourcedetection, batch]
       exporters: [otlphttp/centreon]

@@ -1,5 +1,5 @@
 # Copyright 2025-Present Centreon.
-# SPDX-License-Identifier: 	AGPL-3.0-or-later
+# SPDX-License-Identifier: AGPL-3.0-or-later
 
 receivers:
   filelog/mariadb:
@@ -37,7 +37,7 @@ receivers:
 
 service:
   pipelines:
-    logs:
+    logs/mariadb:
       receivers: [filelog/mariadb]
-      processors: [batch,resourcedetection]
+      processors: [memory_limiter, resourcedetection, batch]
       exporters: [otlphttp/centreon]

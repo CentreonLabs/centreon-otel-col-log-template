@@ -1,5 +1,5 @@
 # Copyright 2025-Present Centreon.
-# SPDX-License-Identifier: 	AGPL-3.0-or-later
+# SPDX-License-Identifier: AGPL-3.0-or-later
 
 receivers:
   filelog/httpd-combined:
@@ -17,7 +17,7 @@ receivers:
         to: attributes["client.address"]
       - type: move
         from: attributes["user"]
-        to: attributes["client.username"]
+        to: attributes["user.name"]
         if: 'attributes["user"] != "-"'
       - type: move
         from: attributes["method"]
@@ -57,7 +57,7 @@ receivers:
 
 service:
   pipelines:
-    logs:
+    logs/httpd-combined:
       receivers: [filelog/httpd-combined]
-      processors: [batch,resourcedetection]
+      processors: [memory_limiter, resourcedetection, batch]
       exporters: [otlphttp/centreon]
