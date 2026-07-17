@@ -1,5 +1,5 @@
 # Copyright 2025-Present Centreon.
-# SPDX-License-Identifier: 	AGPL-3.0-or-later
+# SPDX-License-Identifier: AGPL-3.0-or-later
 
 receivers:
   filelog/postgres-base:
@@ -58,7 +58,7 @@ receivers:
 
 service:
   pipelines:
-    logs:
+    logs/postgres-base:
       receivers: [filelog/postgres-base]
-      processors: [batch, resourcedetection]
+      processors: [memory_limiter, resourcedetection, batch]
       exporters: [otlphttp/centreon]

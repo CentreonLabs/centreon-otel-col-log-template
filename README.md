@@ -18,8 +18,8 @@ directory (e.g., `/etc/otelcol-contrib` on Linux):
 ```shell
 wget https://raw.githubusercontent.com/CentreonLabs/centreon-otel-col-log-template/refs/heads/main/myfile.yaml -O /etc/otelcol-contrib/myfile.yaml
 ```
-Replace myfile.yaml with the actual template filename you wish to use.
 
+Replace myfile.yaml with the actual template filename you wish to use.
 
 2. **Update Collector Command:**
 
@@ -36,11 +36,12 @@ installation.
 ### Template Pipelines
 
 Each template includes a pre-configured pipeline designed to process the parsed
-logs. By default, these pipelines perform the following actions:
+logs. By default, these pipelines perform the following actions, in order:
 
-* **Batching**: Collects logs into batches for efficient export.
-* **Resource Attributes**: Automatically enriches logs with resource attributes from the host, Kubernetes pod, or container where the logs originated.
-* **OTLP Export**: Exports data in OTLP format to an exporter named
+- **Memory Limiting**: Prevents the collector from exceeding its memory budget.
+- **Resource Attributes**: Automatically enriches logs with resource attributes from the host, Kubernetes pod, or container where the logs originated.
+- **Batching**: Collects logs into batches for efficient export.
+- **OTLP Export**: Exports data in OTLP format to an exporter named
   `otlphttp/centreon`.
 
 For more details on OpenTelemetry Collector pipelines, refer to the
@@ -51,9 +52,9 @@ Examples:
 ```yaml
 service:
   pipelines:
-    logs:
+    logs/mylog:
       receivers: [filelog/mylog]
-      processors: [batch,resourcedetection]
+      processors: [memory_limiter, resourcedetection, batch]
       exporters: [otlphttp/centreon]
 ```
 
@@ -61,41 +62,41 @@ service:
 
 ### Apache
 
-* [Apache error](file-apache-error.yaml): The log errors of apache.
+- [Apache error](file-apache-error.yaml): The log errors of apache.
 
 ### Centreon
 
-* [Centreon Broker](file-centreon-broker.yaml): The log file of Centreon Broker.
-* [Centreon Engine](file-centreon-engine.yaml): The log file of Centreon Engine.
-* [Centreon Gorgone](file-centreon-gorgone.yaml): The log file of Centreon Gorgone.
-* [Centreon Web](file-centreon-web.yaml): The log file of Centreon Web.
+- [Centreon Broker](file-centreon-broker.yaml): The log file of Centreon Broker.
+- [Centreon Engine](file-centreon-engine.yaml): The log file of Centreon Engine.
+- [Centreon Gorgone](file-centreon-gorgone.yaml): The log file of Centreon Gorgone.
+- [Centreon Web](file-centreon-web.yaml): The log file of Centreon Web.
 
 ### HTTP
 
-* [Access Log Combined](file-httpd-combined.yaml): The http access log in combined format.
+- [Access Log Combined](file-httpd-combined.yaml): The http access log in combined format.
 
 ### MariaDB
 
-* [MariaDB](file-mariadb.yaml): The log files of MariaDB.
+- [MariaDB](file-mariadb.yaml): The log files of MariaDB.
 
 ### Message / Syslog
 
-* [Linux messages](file-message.yaml): The syslog system log file.
+- [Linux messages](file-message.yaml): The syslog system log file.
 
 ### Tomcat
 
-* [Tomcat](file-tomcat.yaml): The Tomcat log file.
+- [Tomcat](file-tomcat.yaml): The Tomcat log file.
 
 ### PostgreSQL
 
-* [PostgreSQL base](file-postgres-base.yaml): The basic PostgreSQL log file. Log
+- [PostgreSQL base](file-postgres-base.yaml): The basic PostgreSQL log file. Log
   prefix: `%m [%p] `.
 
 ### Redis
 
-* [Redis](file-redis.yaml): Redis log file, with paring role, component, level.
+- [Redis](file-redis.yaml): Redis log file, with paring role, component, level.
 
 ### Windows Event Log
 
-* [Windows Event Log](windows-event-log.yaml): Contains the event log
+- [Windows Event Log](windows-event-log.yaml): Contains the event log
   application parsing with locale US and FR for level conversions.

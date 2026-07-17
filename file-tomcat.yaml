@@ -1,5 +1,5 @@
 # Copyright 2025-Present Centreon.
-# SPDX-License-Identifier: 	AGPL-3.0-or-later
+# SPDX-License-Identifier: AGPL-3.0-or-later
 
 receivers:
   filelog/tomcat-log:
@@ -24,7 +24,7 @@ receivers:
       # Add the service name
       - type: add
         field: resource["service.name"]
-        value: 'apache'
+        value: 'tomcat'
       - type: remove
         field: attributes["ts"]
       - type: remove
@@ -35,7 +35,7 @@ receivers:
 
 service:
   pipelines:
-    logs:
+    logs/tomcat-log:
       receivers: [filelog/tomcat-log]
-      processors: [batch,resourcedetection]
+      processors: [memory_limiter, resourcedetection, batch]
       exporters: [otlphttp/centreon]

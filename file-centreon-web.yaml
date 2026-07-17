@@ -1,10 +1,11 @@
 # Copyright 2025-Present Centreon.
-# SPDX-License-Identifier: 	AGPL-3.0-or-later
+# SPDX-License-Identifier: AGPL-3.0-or-later
 
 receivers:
   filelog/centreon-web:
     include:
       - /var/log/centreon/centreon-web.log
+    include_file_path: true
     operators:
       - type: regex_parser
         regex: '^\[((?P<ts1>\d{4}-\d{2}-\d{2}T\d{2}:\d{2}:\d{2}\+\d{2}:\d{2})|(?P<ts2>\d{4}-\d{2}-\d{2}T\d{2}:\d{2}:\d{2}\+\d{4}))]\s+(?P<unparsed>.*)$'
@@ -18,7 +19,7 @@ receivers:
         if: "attributes['ts2'] != ''"
       - type: regex_parser
         parse_from: attributes["unparsed"]
-        regex: '^\[(?P<level>\w+)\]\s\[(?<funtionname>[^:]+):(?P<line>\d+)\]:\s(?P<body>.*)\s{"context":.*$'
+        regex: '^\[(?P<level>\w+)\]\s\[(?P<functionname>[^:]+):(?P<line>\d+)\]:\s(?P<body>.*)\s{"context":.*$'
         if: "attributes['ts2'] != ''"
       - type: regex_parser
         parse_from: attributes["unparsed"]
@@ -43,9 +44,9 @@ receivers:
         value: 'centreon-web'
       # The log emit information
       - type: move
-        from: attributes["funtionname"]
+        from: attributes["functionname"]
         to: attributes["code.function.name"]
-        if: '"funtionname" in attributes'
+        if: '"functionname" in attributes'
       - type: move
         from: attributes["line"]
         to: attributes["code.line.number"]
@@ -75,7 +76,7 @@ receivers:
 
 service:
   pipelines:
-    logs:
+    logs/centreon-web:
       receivers: [filelog/centreon-web]
-      processors: [batch,resourcedetection]
+      processors: [memory_limiter, resourcedetection, batch]
       exporters: [otlphttp/centreon]

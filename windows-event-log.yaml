@@ -1,5 +1,5 @@
 # Copyright 2025-Present Centreon.
-# SPDX-License-Identifier: 	AGPL-3.0-or-later
+# SPDX-License-Identifier: AGPL-3.0-or-later
 
 receivers:
   windowseventlog/application:
@@ -26,20 +26,20 @@ receivers:
         to: attributes["process.pid"]
       - type: copy
         from: body.provider.name
-        to: resource["event.provider.name"]
+        to: resource["custom.event.provider.name"]
       - type: copy
         from: body.provider.guid
-        to: resource["event.provider.guid"]
+        to: resource["custom.event.provider.guid"]
         if: "body.provider.guid != ''"
       - type: copy
         from: body.event_id.id
-        to: attributes["event.id"]
+        to: attributes["custom.event.id"]
       - type: copy
         from: body.record_id
-        to: attributes["event.record.id"]
+        to: attributes["custom.event.record.id"]
       - type: copy
         from: body.task
-        to: attributes["event.task"]
+        to: attributes["custom.event.task"]
       - type: move
         from: body.message
         to: body
@@ -55,7 +55,7 @@ receivers:
 
 service:
   pipelines:
-    logs:
+    logs/application:
       receivers: [windowseventlog/application]
-      processors: [batch, resourcedetection]
+      processors: [memory_limiter, resourcedetection, batch]
       exporters: [otlphttp/centreon]
