@@ -26,20 +26,20 @@ receivers:
         to: attributes["process.pid"]
       - type: copy
         from: body.provider.name
-        to: resource["centreon.event.provider.name"]
+        to: resource["custom.event.provider.name"]
       - type: copy
         from: body.provider.guid
-        to: resource["centreon.event.provider.guid"]
+        to: resource["custom.event.provider.guid"]
         if: "body.provider.guid != ''"
       - type: copy
         from: body.event_id.id
-        to: attributes["centreon.event.id"]
+        to: attributes["custom.event.id"]
       - type: copy
         from: body.record_id
-        to: attributes["centreon.event.record.id"]
+        to: attributes["custom.event.record.id"]
       - type: copy
         from: body.task
-        to: attributes["centreon.event.task"]
+        to: attributes["custom.event.task"]
       - type: move
         from: body.message
         to: body
