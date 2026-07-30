@@ -24,8 +24,8 @@ receivers:
           parse_from: attributes.ts
           layout_type: strptime
           layout: '%Y-%m-%d %H:%M:%S.%L'
-        # INFO -> INFO: Routine operational lines in the sample (API GETs answered 200/404, image cache checks, instance lifecycle events) — the standard informational level.
-        # WARNING -> WARN: Abnormal-but-handled conditions in the sample ('Unknown base file' from nova.virt.libvirt.imagecache); WARNING folds to canonical WARN.
+        # INFO -> INFO: Routine operational lines in the reference logs (API GETs answered 200/404, image cache checks, instance lifecycle events) — the standard informational level.
+        # WARNING -> WARN: Abnormal-but-handled conditions in the reference logs ('Unknown base file' from nova.virt.libvirt.imagecache); WARNING folds to canonical WARN.
         severity:
           parse_from: attributes.level
           mapping:
@@ -40,8 +40,8 @@ receivers:
           parse_from: attributes.ts
           layout_type: strptime
           layout: '%Y-%m-%d %H:%M:%S.%L'
-        # INFO -> INFO: Routine operational lines in the sample (API GETs answered 200/404, image cache checks, instance lifecycle events) — the standard informational level.
-        # WARNING -> WARN: Abnormal-but-handled conditions in the sample ('Unknown base file' from nova.virt.libvirt.imagecache); WARNING folds to canonical WARN.
+        # INFO -> INFO: Routine operational lines in the reference logs (API GETs answered 200/404, image cache checks, instance lifecycle events) — the standard informational level.
+        # WARNING -> WARN: Abnormal-but-handled conditions in the reference logs ('Unknown base file' from nova.virt.libvirt.imagecache); WARNING folds to canonical WARN.
         severity:
           parse_from: attributes.level
           mapping:

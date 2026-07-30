@@ -16,7 +16,7 @@ receivers:
       - /var/log/hpc.log
     include_file_path: true
     operators:
-      # Single space-separated event format: <log-id> <node> <component> <event-state> <epoch-seconds> <flag> <message>. Every sample line follows it; the log-id and flag fields are captured positionally but dropped (meaning undocumented).
+      # Single space-separated event format: <log-id> <node> <component> <event-state> <epoch-seconds> <flag> <message>. Every line in the reference logs follows it; the log-id and flag fields are captured positionally but dropped (meaning undocumented).
       - type: regex_parser
         regex: ^(?P<id>\d+)\s+(?P<node>\S+)\s+(?P<component>\S+)\s+(?P<state>\S+)\s+(?P<ts>\d+)\s+(?P<flag>\d+)\s+(?P<body>.*)$
         # Fifth field is a Unix epoch timestamp in whole seconds (e.g. 1077804742 = Feb 2004 UTC); the source carries no sub-second precision and no offset.

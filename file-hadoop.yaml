@@ -12,18 +12,18 @@ receivers:
       - /var/log/hadoop/*.log
     include_file_path: true
     operators:
-      # Matches the Hadoop Log4j-style date, severity, thread, Java logger, and message format observed throughout the curated sample.
+      # Matches the Hadoop Log4j-style date, severity, thread, Java logger, and message format observed throughout the reference logs.
       - type: regex_parser
         regex: ^(?P<ts>\d{4}-\d{2}-\d{2} \d{2}:\d{2}:\d{2},\d{3})\s+(?P<level>INFO|WARN|ERROR|FATAL)\s+\[(?P<thread>[^\]]+)\]\s+(?P<logger>[A-Za-z0-9_.$]+):\s*(?P<body>.*)$
-        # The sample uses a four-digit date and 24-hour time followed by comma-separated milliseconds; timestamps without an offset are treated as UTC.
+        # The reference logs use a four-digit date and 24-hour time followed by comma-separated milliseconds; timestamps without an offset are treated as UTC.
         timestamp:
           parse_from: attributes.ts
           layout_type: strptime
           layout: '%Y-%m-%d %H:%M:%S,%L'
-        # INFO -> INFO: INFO marks normal Hadoop application lifecycle, scheduling, and progress messages in the sample.
-        # WARN -> WARN: WARN marks recoverable lease-renewal and address-change conditions that continue retrying in the sample.
-        # ERROR -> ERROR: ERROR marks failed resource-manager contact and exception conditions in the sample.
-        # FATAL -> FATAL: FATAL marks task-ending network failures in the sample and is already the source's canonical fatal level.
+        # INFO -> INFO: INFO marks normal Hadoop application lifecycle, scheduling, and progress messages in the reference logs.
+        # WARN -> WARN: WARN marks recoverable lease-renewal and address-change conditions that continue retrying in the reference logs.
+        # ERROR -> ERROR: ERROR marks failed resource-manager contact and exception conditions in the reference logs.
+        # FATAL -> FATAL: FATAL marks task-ending network failures in the reference logs and is already the source's canonical fatal level.
         severity:
           parse_from: attributes.level
           mapping:

@@ -23,11 +23,11 @@ receivers:
           parse_from: attributes.ts
           layout_type: strptime
           layout: '%m-%d %H:%M:%S.%L'
-        # V -> TRACE: logcat Verbose, below Debug in Android's priority order; sample shows chatty UI diagnostics like 'setLightsOn(true)' — verbose tokens fold to TRACE.
-        # D -> DEBUG: logcat Debug; sample lines are developer diagnostics such as PowerManagerService state dumps and brightness animation traces.
-        # I -> INFO: logcat Info; sample lines report normal lifecycle events (surface destroyed, ActivityRecord info, status-bar visibility).
-        # W -> WARN: logcat Warn; sample lines flag degraded-but-handled conditions, e.g. callers lacking REAL_GET_TASKS having their output limited.
-        # E -> ERROR: logcat Error; sample shows 'applyOptionsLocked: Unknown animationType=0' from ActivityManager — an unexpected failure condition.
+        # V -> TRACE: logcat Verbose, below Debug in Android's priority order; the reference logs show chatty UI diagnostics like 'setLightsOn(true)' — verbose tokens fold to TRACE.
+        # D -> DEBUG: logcat Debug; reference log lines are developer diagnostics such as PowerManagerService state dumps and brightness animation traces.
+        # I -> INFO: logcat Info; reference log lines report normal lifecycle events (surface destroyed, ActivityRecord info, status-bar visibility).
+        # W -> WARN: logcat Warn; reference log lines flag degraded-but-handled conditions, e.g. callers lacking REAL_GET_TASKS having their output limited.
+        # E -> ERROR: logcat Error; the reference logs show 'applyOptionsLocked: Unknown animationType=0' from ActivityManager — an unexpected failure condition.
         severity:
           parse_from: attributes.level
           mapping:

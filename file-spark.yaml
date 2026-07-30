@@ -14,12 +14,12 @@ receivers:
       # Matches Spark's two-digit-year timestamp, uppercase level, logger category, and message body.
       - type: regex_parser
         regex: ^(?P<ts>\d{2}/\d{2}/\d{2} \d{2}:\d{2}:\d{2})\s+(?P<level>[A-Z]+)\s+(?P<logger>[A-Za-z0-9_$.-]+):\s+(?P<body>.*)$
-        # The sample uses zero-padded two-digit year/month/day and 24-hour time without an offset; batch instructions define it as UTC.
+        # The reference logs use zero-padded two-digit year/month/day and 24-hour time without an offset; they are treated as UTC.
         timestamp:
           parse_from: attributes.ts
           layout_type: strptime
           layout: '%y/%m/%d %H:%M:%S'
-        # INFO -> INFO: INFO is the only severity token present in the curated Spark sample and is already canonical.
+        # INFO -> INFO: INFO is the only severity token present in the Spark reference logs and is already canonical.
         severity:
           parse_from: attributes.level
           mapping:

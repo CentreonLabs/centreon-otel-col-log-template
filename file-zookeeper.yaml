@@ -14,14 +14,14 @@ receivers:
       # Matches ZooKeeper's Log4j-style timestamp, severity, thread context, logger class and source line before the message body.
       - type: regex_parser
         regex: ^(?P<ts>\d{4}-\d{2}-\d{2} \d{2}:\d{2}:\d{2},\d{3}) - (?P<level>INFO|WARN|ERROR)\s+\[(?P<thread>.*):(?P<logger>[^:@]+)@(?P<line>\d+)\] - (?P<body>.*)$
-        # The sample uses a four-digit date, 24-hour time and comma-delimited milliseconds without an offset; the configured source timezone is UTC.
+        # The reference logs use a four-digit date, 24-hour time and comma-delimited milliseconds without an offset; the configured source timezone is UTC.
         timestamp:
           parse_from: attributes.ts
           layout_type: strptime
           layout: '%Y-%m-%d %H:%M:%S,%L'
-        # INFO -> INFO: INFO marks routine ZooKeeper connection, session and processing events in the sample.
-        # WARN -> WARN: WARN marks degraded connection and worker conditions in the sample without asserting process failure.
-        # ERROR -> ERROR: ERROR explicitly marks unexpected exceptions causing ZooKeeper handler shutdowns in the sample.
+        # INFO -> INFO: INFO marks routine ZooKeeper connection, session and processing events in the reference logs.
+        # WARN -> WARN: WARN marks degraded connection and worker conditions in the reference logs without asserting process failure.
+        # ERROR -> ERROR: ERROR explicitly marks unexpected exceptions causing ZooKeeper handler shutdowns in the reference logs.
         severity:
           parse_from: attributes.level
           mapping:

@@ -15,13 +15,13 @@ receivers:
       # Matches the legacy Hadoop HDFS format: yyMMdd HHmmss, numeric thread identifier, severity, Java logger category, and message body.
       - type: regex_parser
         regex: ^(?P<ts>\d{6}\s+\d{6})\s+(?P<thread_id>\d+)\s+(?P<level>[A-Z]+)\s+(?P<logger>[A-Za-z0-9_.$]+):\s*(?P<body>.*)$
-        # The sample uses a two-digit year followed by month, day, and a separate compact 24-hour time; timestamps have no offset and are treated as UTC.
+        # The reference logs use a two-digit year followed by month, day, and a separate compact 24-hour time; timestamps have no offset and are treated as UTC.
         timestamp:
           parse_from: attributes.ts
           layout_type: strptime
           layout: '%y%m%d %H%M%S'
-        # INFO -> INFO: INFO is the canonical informational token present in routine block lifecycle records in the sample.
-        # WARN -> WARN: WARN is the canonical warning token present on DataXceiver exception records in the sample.
+        # INFO -> INFO: INFO is the canonical informational token present in routine block lifecycle records in the reference logs.
+        # WARN -> WARN: WARN is the canonical warning token present on DataXceiver exception records in the reference logs.
         severity:
           parse_from: attributes.level
           mapping:

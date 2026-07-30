@@ -22,9 +22,9 @@ receivers:
           parse_from: attributes.epoch
           layout_type: epoch
           layout: s
-        # INFO -> INFO: Routine informational RAS events in the sample: corrected cache parity errors, core-file generation notices, interrupt statistics.
-        # WARNING -> WARN: Canonical WARNING -> WARN folding; sample lines report degraded-but-running conditions ('Node card is not fully functional', service-action shutdown notices).
-        # ERROR -> ERROR: Sample ERROR lines are failed operations in the control system (idoproxydb hit ASSERT condition in IdoTransportMgr::SendPacket) without declared process/node death.
+        # INFO -> INFO: Routine informational RAS events in the reference logs: corrected cache parity errors, core-file generation notices, interrupt statistics.
+        # WARNING -> WARN: Canonical WARNING -> WARN folding; reference log lines report degraded-but-running conditions ('Node card is not fully functional', service-action shutdown notices).
+        # ERROR -> ERROR: ERROR lines in the reference logs are failed operations in the control system (idoproxydb hit ASSERT condition in IdoTransportMgr::SendPacket) without declared process/node death.
         # FATAL -> FATAL: BGL marks unrecoverable, job/node-killing events FATAL: data TLB error interrupt, machine check, ciod failing to read the control stream or load the program image.
         severity:
           parse_from: attributes.level

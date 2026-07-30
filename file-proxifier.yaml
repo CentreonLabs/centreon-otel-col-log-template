@@ -17,14 +17,14 @@ receivers:
       # Matches Proxifier connection lifecycle lines, retaining the executable, destination endpoint, action token, and action-specific detail text.
       - type: regex_parser
         regex: '^\[(?P<ts>\d{2}\.\d{2} \d{2}:\d{2}:\d{2})\] (?P<process>[A-Za-z0-9_.-]+)(?: \*64)? - (?P<target_host>[^:[:space:]]+):(?P<target_port>\d+) (?P<level>open|close|error)(?P<body>.*)$'
-        # The sample uses zero-padded month.day and 24-hour time without a year or offset; the collector supplies the current year, and this pack assumes UTC as specified for the source.
+        # The reference logs use zero-padded month.day and 24-hour time without a year or offset; the collector supplies the current year, and this pack assumes UTC as specified for the source.
         timestamp:
           parse_from: attributes.ts
           layout_type: strptime
           layout: '%m.%d %H:%M:%S'
-        # open -> INFO: The token records a normal connection-open lifecycle event in the sample.
+        # open -> INFO: The token records a normal connection-open lifecycle event in the reference logs.
         # close -> INFO: The token records a normal connection-close lifecycle event with transfer statistics.
-        # error -> ERROR: The token accompanies explicit connection and proxy failure messages in the sample.
+        # error -> ERROR: The token accompanies explicit connection and proxy failure messages in the reference logs.
         severity:
           parse_from: attributes.level
           mapping:

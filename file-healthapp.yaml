@@ -28,7 +28,7 @@ receivers:
       - type: move
         from: attributes["component"]
         to: attributes["custom.component"]
-      # Third pipe-delimited field is the numeric process id emitting the line (constant 30002312 in the sample).
+      # Third pipe-delimited field is the numeric process id emitting the line (constant 30002312 in the reference logs).
       - type: move
         from: attributes["pid"]
         to: attributes["process.pid"]

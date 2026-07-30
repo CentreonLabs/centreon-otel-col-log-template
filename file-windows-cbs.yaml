@@ -20,7 +20,7 @@ receivers:
           parse_from: attributes.ts
           layout_type: strptime
           layout: '%Y-%m-%d %H:%M:%S'
-        # Info -> INFO: Every sampled line carries 'Info' in the level column, including routine servicing-stack and session messages; it is CBS's normal informational level.
+        # Info -> INFO: Every line in the reference logs carries 'Info' in the level column, including routine servicing-stack and session messages; it is CBS's normal informational level.
         severity:
           parse_from: attributes.level
           mapping:
