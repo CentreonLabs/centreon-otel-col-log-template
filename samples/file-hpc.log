@@ -1,0 +1,50 @@
+134681 node-246 unix.hw state_change.unavailable 1077804742 1 Component State Change: Component \042SCSI-WWID:01000010:6005-08b4-0001-00c6-0006-3000-003d-0000\042 is in the unavailable state (HWID=1973)
+350766 node-109 unix.hw state_change.unavailable 1084680778 1 Component State Change: Component \042alt0\042 is in the unavailable state (HWID=3180)
+344518 node-246 unix.hw state_change.unavailable 1084270955 1 Component State Change: Component \042alt0\042 is in the unavailable state (HWID=5089)
+177730 node-200 action start 1077894469 1 wait  (command 2449)
+186693 node-125 action start 1077903223 1 wait  (command 2468)
+217168 node-248 action start 1078468218 1 boot  (command 2517)
+70287 node-70 action start 1108647096 1 wait  (command 3412)
+134299 node-251 action start 1111862280 1 boot  (command 3519)
+191604 node-13 action start 1131239917 1 boot  (command 3964)
+193032 node-46 action start 1131241563 1 wait  (command 3973)
+183109 node-D7 clusterfilesystem clusterfilesystem.no_server 1077901705 1 ClusterFileSystem: There is no server for ServerFileSystem domain storage1622
+286151 node-D0 clusterfilesystem clusterfilesystem.no_server 1134669644 1 ClusterFileSystem: There is no server for ServerFileSystem domain storage531
+180537 node-D0 clusterfilesystem fdmn.panic 1131228351 1 ServerFileSystem: An ServerFileSystem domain panic has occurred on storage442
+30700 Interconnect-1T00 switch_module bcast-error 1076189965 1 Link error
+2596168 node-211 node status 1074289105 1 not responding
+234321 node-54 node status 1079013840 1 configured out
+56327 node-175 node status 1126814970 0 running
+260401 full partition status 1133290901 1 running
+2585341 gige7 gige temperature 1074234092 1 critical
+31923 gige4 gige temperature 1076386562 1 critical
+199198 gige7 gige temperature 1078057114 1 warning
+226272 gige7 gige temperature 1078672165 1 warning
+395945 gige5 gige temperature 1089210393 1 warning
+434839 gige5 gige temperature 1095964227 1 normal
+49162 node-8 node temperature 1106245773 1 ambient=27
+51616 gige3 gige temperature 1106579555 1 normal
+89824 gige4 gige temperature 1109420069 1 critical
+124170 gige1 gige temperature 1111273753 1 warning
+118228 gige2 gige temperature 1111173008 1 warning
+147517 node-70 node temperature 1112734890 1 ambient=32
+272853 gige7 gige temperature 1119710825 1 critical
+289970 gige6 gige temperature 1121318857 1 normal
+289181 node-218 node temperature 1121124240 1 ambient=29
+120755 node-233 node temperature 1129305602 1 ambient=28
+154424 gige3 gige temperature 1130137268 1 warning
+173985 node-130 node temperature 1131220932 1 ambient=29
+167256 node-237 node temperature 1130853781 1 ambient=30
+380813 node-98 node temperature 1141951865 1 ambient=30
+387363 gige7 gige temperature 1142103247 1 critical
+408247 gige3 gige temperature 1142754835 1 normal
+480082 gige7 gige temperature 1146100398 1 critical
+2559445 Interconnect-1N01 switch_module error 1073128433 1 Link ok
+2614572 Interconnect-1N01 switch_module error 1074747779 1 Linkerror event interval expired
+87093 Interconnect-1N01 switch_module error 1077384074 1 Linkerror event interval expired
+87674 Interconnect-1N01 switch_module error 1077460673 1 Linkerror event interval expired
+156575 Interconnect-1N03 switch_module error 1077865581 1 Linkerror event interval expired
+157160 Interconnect-1N03 switch_module error 1077867221 1 Linkerror event interval expired
+309088 Interconnect-1N03 switch_module error 1082038957 1 Linkerror event interval expired
+163591 Interconnect-1T01 switch_module error 1130665941 1 link errors remain current
+236414 Interconnect-1T01 switch_module error 1132422989 1 link errors remain current
