@@ -60,10 +60,6 @@ service:
 
 ## List of templates
 
-Sample log lines for the LogHub-derived templates are available in the
-[samples](samples/) directory (one `.log` file per template, taken from the
-public [LogHub](https://github.com/logpai/loghub) research datasets).
-
 ### Android
 
 - [Android logcat](file-android-logcat.yaml): Android logcat output in `threadtime` format.
