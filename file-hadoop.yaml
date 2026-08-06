@@ -1,0 +1,70 @@
+# Copyright 2026-Present Centreon.
+# SPDX-License-Identifier: AGPL-3.0-or-later
+
+# Apache Hadoop Log4j-style log files.
+# The include glob assumes Hadoop logs live under /var/log/hadoop. The reference
+# logs contain one complete timestamped record per line and no stack-trace
+# continuation lines, so multiline recombination is not enabled.
+
+receivers:
+  filelog/hadoop:
+    include:
+      - /var/log/hadoop/*.log
+    include_file_path: true
+    operators:
+      # Matches the Hadoop Log4j-style date, severity, thread, Java logger, and message format observed throughout the reference logs.
+      - type: regex_parser
+        regex: ^(?P<ts>\d{4}-\d{2}-\d{2} \d{2}:\d{2}:\d{2},\d{3})\s+(?P<level>INFO|WARN|ERROR|FATAL)\s+\[(?P<thread>[^\]]+)\]\s+(?P<logger>[A-Za-z0-9_.$]+):\s*(?P<body>.*)$
+        # The reference logs use a four-digit date and 24-hour time followed by comma-separated milliseconds; timestamps without an offset are treated as UTC.
+        timestamp:
+          parse_from: attributes.ts
+          layout_type: strptime
+          layout: '%Y-%m-%d %H:%M:%S,%L'
+        # INFO -> INFO: INFO marks normal Hadoop application lifecycle, scheduling, and progress messages in the reference logs.
+        # WARN -> WARN: WARN marks recoverable lease-renewal and address-change conditions that continue retrying in the reference logs.
+        # ERROR -> ERROR: ERROR marks failed resource-manager contact and exception conditions in the reference logs.
+        # FATAL -> FATAL: FATAL marks task-ending network failures in the reference logs and is already the source's canonical fatal level.
+        severity:
+          parse_from: attributes.level
+          mapping:
+            info: INFO
+            warn: WARN
+            error: ERROR
+            fatal: FATAL
+      - type: move
+        from: attributes["body"]
+        to: body
+      # The bracketed value identifies the Java thread or executor handling the event, matching the official thread.name convention.
+      - type: move
+        from: attributes["thread"]
+        to: attributes["thread.name"]
+      # The fully qualified Java logger class has no matching attribute in the pinned official registry, so it uses a documented custom namespace.
+      - type: move
+        from: attributes["logger"]
+        to: attributes["custom.logger.name"]
+      # The pack version — bump when the pack changes
+      - type: add
+        field: resource["service.version"]
+        value: 1.0.0
+      # service.name is the resource identity Pulse filters on
+      - type: add
+        field: resource["service.name"]
+        value: hadoop-mapreduce
+      # Drop the temp captures consumed by the parsing blocks above
+      - type: remove
+        field: attributes["level"]
+      - type: remove
+        field: attributes["ts"]
+# Wire the receiver into the fixed production pipeline (the processors
+# and the otlphttp/centreon exporter are defined by the base config).
+service:
+  pipelines:
+    logs/hadoop:
+      receivers:
+        - filelog/hadoop
+      processors:
+        - memory_limiter
+        - resourcedetection
+        - batch
+      exporters:
+        - otlphttp/centreon

@@ -1,0 +1,79 @@
+# Copyright 2026-Present Centreon.
+# SPDX-License-Identifier: AGPL-3.0-or-later
+
+# Android logcat output in 'threadtime' format.
+# The include path is an assumed location: adjust it to wherever logcat output
+# is persisted on the target host. Timestamps carry no year (the collector fills
+# in the current year, so January lines read from a December file are mis-dated)
+# and no UTC offset (assumed UTC). Severity F (logcat Fatal) is left unmapped
+# because it was not observed in the reference logs; the regex still matches
+# such lines.
+
+receivers:
+  filelog/android-logcat:
+    include:
+      - /var/log/android/logcat.log
+    include_file_path: true
+    operators:
+      # Android logcat 'threadtime' format: MM-DD HH:MM:SS.mmm PID TID LEVEL Tag: message. The level class covers the full logcat alphabet (V/D/I/W/E/F) even though F was not observed, so a fatal line still parses.
+      - type: regex_parser
+        regex: '^(?P<ts>\d{2}-\d{2} \d{2}:\d{2}:\d{2}\.\d{3})\s+(?P<pid>\d+)\s+(?P<tid>\d+)\s+(?P<level>[VDIWEF])\s+(?P<tag>[^:]+?)\s*: ?(?P<body>.*)$'
+        # logcat threadtime timestamps carry no year and no UTC offset; the collector fills the current year and, absent an offset, treats the time as UTC per the source owner's assumption.
+        timestamp:
+          parse_from: attributes.ts
+          layout_type: strptime
+          layout: '%m-%d %H:%M:%S.%L'
+        # V -> TRACE: logcat Verbose, below Debug in Android's priority order; the reference logs show chatty UI diagnostics like 'setLightsOn(true)' — verbose tokens fold to TRACE.
+        # D -> DEBUG: logcat Debug; reference log lines are developer diagnostics such as PowerManagerService state dumps and brightness animation traces.
+        # I -> INFO: logcat Info; reference log lines report normal lifecycle events (surface destroyed, ActivityRecord info, status-bar visibility).
+        # W -> WARN: logcat Warn; reference log lines flag degraded-but-handled conditions, e.g. callers lacking REAL_GET_TASKS having their output limited.
+        # E -> ERROR: logcat Error; the reference logs show 'applyOptionsLocked: Unknown animationType=0' from ActivityManager — an unexpected failure condition.
+        severity:
+          parse_from: attributes.level
+          mapping:
+            trace: V
+            debug: D
+            info: I
+            warn: W
+            error: E
+      - type: move
+        from: attributes["body"]
+        to: body
+      # Process ID of the emitting Android process (e.g. 1702 = system_server).
+      - type: move
+        from: attributes["pid"]
+        to: attributes["process.pid"]
+      # Thread ID within the emitting process, as printed by logcat threadtime.
+      - type: move
+        from: attributes["tid"]
+        to: attributes["thread.id"]
+      # logcat tag naming the component (WindowManager, PowerManagerService, ...). No semconv attribute covers it: the android namespace only defines app.state and os.api_level, and code.* describes source locations, not log tags.
+      - type: move
+        from: attributes["tag"]
+        to: attributes["custom.android.log.tag"]
+      # The pack version — bump when the pack changes
+      - type: add
+        field: resource["service.version"]
+        value: 1.0.0
+      # service.name is the resource identity Pulse filters on
+      - type: add
+        field: resource["service.name"]
+        value: android-logcat
+      # Drop the temp captures consumed by the parsing blocks above
+      - type: remove
+        field: attributes["level"]
+      - type: remove
+        field: attributes["ts"]
+# Wire the receiver into the fixed production pipeline (the processors
+# and the otlphttp/centreon exporter are defined by the base config).
+service:
+  pipelines:
+    logs/android-logcat:
+      receivers:
+        - filelog/android-logcat
+      processors:
+        - memory_limiter
+        - resourcedetection
+        - batch
+      exporters:
+        - otlphttp/centreon

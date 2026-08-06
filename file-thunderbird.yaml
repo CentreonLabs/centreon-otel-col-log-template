@@ -1,0 +1,63 @@
+# Copyright 2026-Present Centreon.
+# SPDX-License-Identifier: AGPL-3.0-or-later
+
+# Thunderbird supercomputer log file.
+# The format carries no severity field, so no severity is mapped (none is
+# synthesized from message keywords) and records arrive with severity unset. The
+# leading column is the alert-category label ('-' = benign); it is matched but
+# dropped, and non-'-' labels still parse. The include path was not confirmed on
+# the target host, adjust it before deploying.
+
+receivers:
+  filelog/thunderbird:
+    include:
+      - /var/log/thunderbird.log
+    include_file_path: true
+    operators:
+      # Thunderbird centralized syslog: '<label> <epoch> <YYYY.MM.DD> <host> <Mon D HH:MM:SS> <origin> tag[(module)][pid]: <message>'. The alert label ('-' on benign lines), the human-readable dates and the origin field are matched but not kept; the whole 'tag[pid]:' prefix is optional so untagged kernel-console lines (e.g. 'ACPI: ...') still parse, with the prefix folded into the process capture when present.
+      - type: regex_parser
+        regex: '^\S+ (?P<ts>\d+) \d{4}\.\d{2}\.\d{2} (?P<hostname>\S+) \w{3} +\d+ \d{2}:\d{2}:\d{2} \S+ (?:(?P<process>[\w./-]+)(?:\([^)]+\))?(?:\[(?P<pid>\d+)\])?: )?(?P<body>.*)$'
+        # The first numeric field is Unix epoch seconds (it agrees with the adjacent human-readable date), so it parses timezone-unambiguously — preferred over the offset-less 'Mon D HH:MM:SS' syslog date, which would also need the year filled in.
+        timestamp:
+          parse_from: attributes.ts
+          layout_type: epoch
+          layout: s
+      - type: move
+        from: attributes["body"]
+        to: body
+      # Originating cluster node (dn228, cn661, tbird-admin1, ...). This is a centralized log, so the emitter must be kept per record — resource detection would report the collector host instead.
+      - type: move
+        from: attributes["hostname"]
+        to: attributes["host.name"]
+      # Syslog tag before the optional [pid] — usually the daemon name (crond, ntpd, sshd); occasionally a full executable path (gmetad) or, on kernel console lines, a subsystem token (ACPI, CPU).
+      - type: move
+        from: attributes["process"]
+        to: attributes["process.executable.name"]
+      # PID from the '[NNNN]' suffix of the syslog tag; empty on tagless lines and on daemons that log without a PID (dhcpd, gmetad warnings).
+      - type: move
+        from: attributes["pid"]
+        to: attributes["process.pid"]
+      # The pack version — bump when the pack changes
+      - type: add
+        field: resource["service.version"]
+        value: 1.0.0
+      # service.name is the resource identity Pulse filters on
+      - type: add
+        field: resource["service.name"]
+        value: thunderbird
+      # Drop the temp captures consumed by the parsing blocks above
+      - type: remove
+        field: attributes["ts"]
+# Wire the receiver into the fixed production pipeline (the processors
+# and the otlphttp/centreon exporter are defined by the base config).
+service:
+  pipelines:
+    logs/thunderbird:
+      receivers:
+        - filelog/thunderbird
+      processors:
+        - memory_limiter
+        - resourcedetection
+        - batch
+      exporters:
+        - otlphttp/centreon

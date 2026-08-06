@@ -1,0 +1,60 @@
+# Copyright 2026-Present Centreon.
+# SPDX-License-Identifier: AGPL-3.0-or-later
+
+# Windows Component-Based Servicing (CBS) log file.
+# Only the 'Info' severity token is mapped, the one observed in the reference
+# logs; real CBS logs can also emit 'Warning' and 'Error' in the level column.
+# Timestamps carry no UTC offset and are assumed UTC.
+
+receivers:
+  filelog/windows-cbs:
+    include:
+      - C:/Windows/Logs/CBS/CBS.log
+    include_file_path: true
+    operators:
+      # Windows CBS.log line: '<YYYY-MM-DD HH:MM:SS>, <Level> <Component> <message>'. Level and component are padded with spaces to fixed columns, hence \s+ separators; component is a short subsystem tag (CBS, CSI).
+      - type: regex_parser
+        regex: ^(?P<ts>\d{4}-\d{2}-\d{2} \d{2}:\d{2}:\d{2}), (?P<level>[A-Za-z]+)\s+(?P<component>\S+)\s+(?P<body>.*)$
+        # CBS timestamps are second-precision local-format 'YYYY-MM-DD HH:MM:SS' with no UTC offset; treated as UTC.
+        timestamp:
+          parse_from: attributes.ts
+          layout_type: strptime
+          layout: '%Y-%m-%d %H:%M:%S'
+        # Info -> INFO: Every line in the reference logs carries 'Info' in the level column, including routine servicing-stack and session messages; it is CBS's normal informational level.
+        severity:
+          parse_from: attributes.level
+          mapping:
+            info: Info
+      - type: move
+        from: attributes["body"]
+        to: body
+      # Windows servicing subsystem tag emitting the line (CBS, CSI). No official semconv attribute covers a component/subsystem tag, so it is kept under the custom.* namespace.
+      - type: move
+        from: attributes["component"]
+        to: attributes["custom.cbs.component"]
+      # The pack version — bump when the pack changes
+      - type: add
+        field: resource["service.version"]
+        value: 1.0.0
+      # service.name is the resource identity Pulse filters on
+      - type: add
+        field: resource["service.name"]
+        value: windows-cbs
+      # Drop the temp captures consumed by the parsing blocks above
+      - type: remove
+        field: attributes["level"]
+      - type: remove
+        field: attributes["ts"]
+# Wire the receiver into the fixed production pipeline (the processors
+# and the otlphttp/centreon exporter are defined by the base config).
+service:
+  pipelines:
+    logs/windows-cbs:
+      receivers:
+        - filelog/windows-cbs
+      processors:
+        - memory_limiter
+        - resourcedetection
+        - batch
+      exporters:
+        - otlphttp/centreon

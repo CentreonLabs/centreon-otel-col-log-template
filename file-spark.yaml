@@ -1,0 +1,59 @@
+# Copyright 2026-Present Centreon.
+# SPDX-License-Identifier: AGPL-3.0-or-later
+
+# Apache Spark log files.
+# The include path is inferred, adjust it to the Spark log directory on the
+# target host. Timestamps carry no UTC offset and are interpreted as UTC.
+
+receivers:
+  filelog/spark:
+    include:
+      - /var/log/spark/*.log
+    include_file_path: true
+    operators:
+      # Matches Spark's two-digit-year timestamp, uppercase level, logger category, and message body.
+      - type: regex_parser
+        regex: ^(?P<ts>\d{2}/\d{2}/\d{2} \d{2}:\d{2}:\d{2})\s+(?P<level>[A-Z]+)\s+(?P<logger>[A-Za-z0-9_$.-]+):\s+(?P<body>.*)$
+        # The reference logs use zero-padded two-digit year/month/day and 24-hour time without an offset; they are treated as UTC.
+        timestamp:
+          parse_from: attributes.ts
+          layout_type: strptime
+          layout: '%y/%m/%d %H:%M:%S'
+        # INFO -> INFO: INFO is the only severity token present in the Spark reference logs and is already canonical.
+        severity:
+          parse_from: attributes.level
+          mapping:
+            info: INFO
+      - type: move
+        from: attributes["body"]
+        to: body
+      # The capture is Spark's logger category; the pinned official registry has no attribute for a logger name, so it uses the custom namespace.
+      - type: move
+        from: attributes["logger"]
+        to: attributes["custom.logger.name"]
+      # The pack version — bump when the pack changes
+      - type: add
+        field: resource["service.version"]
+        value: 1.0.0
+      # service.name is the resource identity Pulse filters on
+      - type: add
+        field: resource["service.name"]
+        value: spark
+      # Drop the temp captures consumed by the parsing blocks above
+      - type: remove
+        field: attributes["level"]
+      - type: remove
+        field: attributes["ts"]
+# Wire the receiver into the fixed production pipeline (the processors
+# and the otlphttp/centreon exporter are defined by the base config).
+service:
+  pipelines:
+    logs/spark:
+      receivers:
+        - filelog/spark
+      processors:
+        - memory_limiter
+        - resourcedetection
+        - batch
+      exporters:
+        - otlphttp/centreon

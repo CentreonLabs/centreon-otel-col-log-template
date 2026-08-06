@@ -1,0 +1,125 @@
+# Copyright 2026-Present Centreon.
+# SPDX-License-Identifier: AGPL-3.0-or-later
+
+# OpenStack Nova log files.
+# Only the INFO and WARNING severity tokens are mapped, the ones observed in the
+# reference logs; the other OpenStack levels (DEBUG, ERROR, CRITICAL, AUDIT,
+# TRACE) surface without a severity until the mapping is extended. The include
+# glob is a placeholder. Lines are expected to carry the leading origin-file
+# token that aggregated Nova logs have; plain per-service logs without that
+# prefix will not parse. Timestamps carry no UTC offset and are assumed UTC.
+
+receivers:
+  filelog/openstack-nova:
+    include:
+      - /var/log/openstack/nova-*.log
+    include_file_path: true
+    operators:
+      # Eventlet WSGI access lines (nova.osapi_compute / nova.metadata wsgi.server): <client-ip[,proxy-ip...]> "<method> <path> HTTP/<ver>" status: <code> len: <bytes> time: <seconds>. Only the first IP of the comma-separated chain is captured as the client address.
+      - type: regex_parser
+        regex: '^(?P<file>\S+) (?P<ts>\d{4}-\d{2}-\d{2} \d{2}:\d{2}:\d{2}\.\d{3}) (?P<pid>\d+) (?P<level>[A-Z]+) (?P<logger>\S+) \[(?P<request_context>[^\]]*)\] (?P<body>(?P<client_address>\d{1,3}(?:\.\d{1,3}){3})(?:,[\d.,]+)? "(?P<http_method>[A-Z]+) (?P<url_path>\S+) HTTP/(?P<protocol_version>[\d.]+)" status: (?P<status_code>\d{3}) len: (?P<response_size>\d+) time: (?P<duration>\d+\.\d+))$'
+        if: "body contains '\" status: '"
+        # Millisecond-precision timestamps with no UTC offset; the host writes UTC (confirmed at onboarding), which is also the collector's default when no zone is parsed.
+        timestamp:
+          parse_from: attributes.ts
+          layout_type: strptime
+          layout: '%Y-%m-%d %H:%M:%S.%L'
+        # INFO -> INFO: Routine operational lines in the reference logs (API GETs answered 200/404, image cache checks, instance lifecycle events) — the standard informational level.
+        # WARNING -> WARN: Abnormal-but-handled conditions in the reference logs ('Unknown base file' from nova.virt.libvirt.imagecache); WARNING folds to canonical WARN.
+        severity:
+          parse_from: attributes.level
+          mapping:
+            info: INFO
+            warn: WARNING
+      # All other Nova operational lines: <origin-file> <date> <time> <pid> <LEVEL> <logger> [<request context>] <message>.
+      - type: regex_parser
+        regex: ^(?P<file>\S+) (?P<ts>\d{4}-\d{2}-\d{2} \d{2}:\d{2}:\d{2}\.\d{3}) (?P<pid>\d+) (?P<level>[A-Z]+) (?P<logger>\S+) \[(?P<request_context>[^\]]*)\] (?P<body>.*)$
+        if: "not (body contains '\" status: ')"
+        # Millisecond-precision timestamps with no UTC offset; the host writes UTC (confirmed at onboarding), which is also the collector's default when no zone is parsed.
+        timestamp:
+          parse_from: attributes.ts
+          layout_type: strptime
+          layout: '%Y-%m-%d %H:%M:%S.%L'
+        # INFO -> INFO: Routine operational lines in the reference logs (API GETs answered 200/404, image cache checks, instance lifecycle events) — the standard informational level.
+        # WARNING -> WARN: Abnormal-but-handled conditions in the reference logs ('Unknown base file' from nova.virt.libvirt.imagecache); WARNING folds to canonical WARN.
+        severity:
+          parse_from: attributes.level
+          mapping:
+            info: INFO
+            warn: WARNING
+      - type: move
+        from: attributes["body"]
+        to: body
+      # Each line is prefixed with the rotated log file it originated from (nova-api.log.1.<date>, nova-compute.log.1.<date>) — the lines are aggregated from several Nova services into one tailed file, so this is more specific than the receiver-set file name it overrides.
+      - type: move
+        from: attributes["file"]
+        to: attributes["log.file.name"]
+      # PID of the Nova worker process that emitted the line.
+      - type: move
+        from: attributes["pid"]
+        to: attributes["process.pid"]
+      # Python logger name (nova.osapi_compute.wsgi.server, nova.compute.manager, ...) identifying the emitting module; no semconv attribute covers a logger name, hence a custom name.
+      - type: move
+        from: attributes["logger"]
+        to: attributes["custom.logger"]
+      # OpenStack request context as logged: '<request-id> <user-id> <project-id> - - -', or '-' for lines outside any request; kept whole because the fields are frequently '-'.
+      - type: move
+        from: attributes["request_context"]
+        to: attributes["custom.openstack.request_context"]
+      # First (originating) IP of the WSGI client chain; downstream proxy hops after the comma are dropped.
+      - type: move
+        from: attributes["client_address"]
+        to: attributes["client.address"]
+        if: attributes["client_address"] != nil
+      - type: move
+        from: attributes["http_method"]
+        to: attributes["http.request.method"]
+        if: attributes["http_method"] != nil
+      - type: move
+        from: attributes["url_path"]
+        to: attributes["url.path"]
+        if: attributes["url_path"] != nil
+      - type: move
+        from: attributes["protocol_version"]
+        to: attributes["network.protocol.version"]
+        if: attributes["protocol_version"] != nil
+      - type: move
+        from: attributes["status_code"]
+        to: attributes["http.response.status_code"]
+        if: attributes["status_code"] != nil
+      # Eventlet WSGI 'len:' field — response body length in bytes.
+      - type: move
+        from: attributes["response_size"]
+        to: attributes["http.response.body.size"]
+        if: attributes["response_size"] != nil
+      # Eventlet WSGI 'time:' field — wall-clock request duration in seconds; no semconv attribute exists for request duration (it is a metric), hence a custom name.
+      - type: move
+        from: attributes["duration"]
+        to: attributes["custom.http.request.duration_seconds"]
+        if: attributes["duration"] != nil
+      # The pack version — bump when the pack changes
+      - type: add
+        field: resource["service.version"]
+        value: 1.0.0
+      # service.name is the resource identity Pulse filters on
+      - type: add
+        field: resource["service.name"]
+        value: openstack-nova
+      # Drop the temp captures consumed by the parsing blocks above
+      - type: remove
+        field: attributes["level"]
+      - type: remove
+        field: attributes["ts"]
+# Wire the receiver into the fixed production pipeline (the processors
+# and the otlphttp/centreon exporter are defined by the base config).
+service:
+  pipelines:
+    logs/openstack-nova:
+      receivers:
+        - filelog/openstack-nova
+      processors:
+        - memory_limiter
+        - resourcedetection
+        - batch
+      exporters:
+        - otlphttp/centreon
