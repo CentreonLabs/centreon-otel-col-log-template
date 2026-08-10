@@ -1,7 +1,10 @@
 # Copyright 2026-Present Centreon.
 # SPDX-License-Identifier: AGPL-3.0-or-later
 
-# Windows Component-Based Servicing (CBS) log file.
+# Title: Windows CBS
+# Description: The Windows Component-Based Servicing log file
+#   (`C:\Windows\Logs\CBS\CBS.log`).
+#
 # Only the 'Info' severity token is mapped, the one observed in the reference
 # logs; real CBS logs can also emit 'Warning' and 'Error' in the level column.
 # Timestamps carry no UTC offset and are assumed UTC.

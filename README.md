@@ -67,19 +67,19 @@ service:
 
 ### Apache
 
-- [Apache error](file-apache-error.yaml): The log errors of apache.
+- [Apache error](file-apache-error.yaml): The Apache HTTP Server error log (`error_log`).
 
 ### Centreon
 
-- [Centreon Broker](file-centreon-broker.yaml): The log file of Centreon Broker.
-- [Centreon Engine](file-centreon-engine.yaml): The log file of Centreon Engine.
-- [Centreon Gorgone](file-centreon-gorgone.yaml): The log file of Centreon Gorgone.
-- [Centreon Web](file-centreon-web.yaml): The log file of Centreon Web.
+- [Centreon Broker](file-centreon-broker.yaml): The log files of Centreon Broker.
+- [Centreon Engine](file-centreon-engine.yaml): The log files of Centreon Engine, in both the ISO 8601 and the legacy epoch-timestamp line formats.
+- [Centreon Gorgone](file-centreon-gorgone.yaml): The log files of Centreon Gorgone.
+- [Centreon Web](file-centreon-web.yaml): The Centreon Web log file (`centreon-web.log`), including the JSON context payload appended to each line.
 
 ### Hadoop
 
-- [Hadoop](file-hadoop.yaml): The Hadoop Log4j-style log files (ResourceManager, NodeManager, ...).
-- [HDFS](file-hdfs.yaml): The legacy Hadoop HDFS DataNode/NameNode log files.
+- [Hadoop](file-hadoop.yaml): The Apache Hadoop Log4j-style log files (ResourceManager, NodeManager, ...).
+- [HDFS](file-hdfs.yaml): The legacy Hadoop HDFS DataNode/NameNode log files, in the `yyMMdd HHmmss` format.
 
 ### HPC
 
@@ -88,7 +88,7 @@ service:
 
 ### HTTP
 
-- [Access Log Combined](file-httpd-combined.yaml): The http access log in combined format.
+- [Access Log Combined](file-httpd-combined.yaml): The HTTP access log in combined format.
 
 ### macOS
 
@@ -100,7 +100,7 @@ service:
 
 ### Message / Syslog
 
-- [Linux messages](file-message.yaml): The syslog system log file.
+- [Linux messages](file-message.yaml): The syslog system log file (`/var/log/messages`). The emitting process name becomes the service name.
 - [Thunderbird](file-thunderbird.yaml): The Thunderbird supercomputer centralized syslog (alert label, epoch and origin-host prefix).
 
 ### OpenStack
@@ -117,26 +117,23 @@ service:
 
 ### Tomcat
 
-- [Tomcat](file-tomcat.yaml): The Tomcat log file.
+- [Tomcat](file-tomcat.yaml): The log files of Apache Tomcat.
 
 ### PostgreSQL
 
-- [PostgreSQL base](file-postgres-base.yaml): The basic PostgreSQL log file. Log
-  prefix: `%m [%p] `.
+- [PostgreSQL base](file-postgres-base.yaml): The basic PostgreSQL log file, with the log prefix `%m [%p] `. Multiline records (statements, hints, context) are recombined.
 
 ### Redis
 
-- [Redis](file-redis.yaml): Redis log file, with paring role, component, level.
+- [Redis](file-redis.yaml): The Redis server log file, parsing the role, component and level.
 
 ### Windows CBS
 
-- [Windows CBS](file-windows-cbs.yaml): The Windows Component-Based Servicing
-  log file (`C:\Windows\Logs\CBS\CBS.log`).
+- [Windows CBS](file-windows-cbs.yaml): The Windows Component-Based Servicing log file (`C:\Windows\Logs\CBS\CBS.log`).
 
 ### Windows Event Log
 
-- [Windows Event Log](windows-event-log.yaml): Contains the event log
-  application parsing with locale US and FR for level conversions.
+- [Windows Event Log](windows-event-log.yaml): The Windows application event log channel, with US and FR locale level conversions.
 
 ### ZooKeeper
 

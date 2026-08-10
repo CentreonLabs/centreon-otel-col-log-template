@@ -1,7 +1,9 @@
 # Copyright 2026-Present Centreon.
 # SPDX-License-Identifier: AGPL-3.0-or-later
 
-# Blue Gene/L RAS log file.
+# Title: BGL RAS
+# Description: The IBM Blue Gene/L RAS event log.
+#
 # The include path is a placeholder: set it to the RAS log path on the target
 # host. The record timestamp comes from the epoch-seconds field, so the
 # sub-second precision of the wall-clock field is not preserved; that field

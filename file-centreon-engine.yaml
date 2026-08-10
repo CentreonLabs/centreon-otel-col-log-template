@@ -1,6 +1,10 @@
 # Copyright 2025-Present Centreon.
 # SPDX-License-Identifier: AGPL-3.0-or-later
 
+# Title: Centreon Engine
+# Description: The log files of Centreon Engine, in both the ISO 8601 and the
+#   legacy epoch-timestamp line formats.
+
 receivers:
   filelog/centreon-engine:
     include:

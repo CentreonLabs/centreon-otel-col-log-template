@@ -1,7 +1,9 @@
 # Copyright 2026-Present Centreon.
 # SPDX-License-Identifier: AGPL-3.0-or-later
 
-# Apache ZooKeeper Log4j-style log files.
+# Title: ZooKeeper
+# Description: The Apache ZooKeeper Log4j-style log files.
+#
 # Single-line format only. Timestamps carry no UTC offset and are interpreted as
 # UTC. The include glob assumes the conventional /var/log/zookeeper directory.
 

@@ -1,6 +1,10 @@
 # Copyright 2025-Present Centreon.
 # SPDX-License-Identifier: AGPL-3.0-or-later
 
+# Title: Windows Event Log
+# Description: The Windows application event log channel, with US and FR locale
+#   level conversions.
+
 receivers:
   windowseventlog/application:
     channel: application

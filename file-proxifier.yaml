@@ -1,7 +1,9 @@
 # Copyright 2026-Present Centreon.
 # SPDX-License-Identifier: AGPL-3.0-or-later
 
-# Proxifier log file.
+# Title: Proxifier
+# Description: The Proxifier connection lifecycle log.
+#
 # The include path is a deployment placeholder and must be adjusted if needed.
 # Timestamps omit the year and the timezone: the current year is supplied by the
 # collector and offset-free values are interpreted as UTC. Action-specific

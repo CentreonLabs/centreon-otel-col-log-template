@@ -1,7 +1,9 @@
 # Copyright 2026-Present Centreon.
 # SPDX-License-Identifier: AGPL-3.0-or-later
 
-# Android HealthApp pipe-delimited log file.
+# Title: HealthApp
+# Description: The Android HealthApp pipe-delimited log file.
+#
 # The format has no severity field (every line is plain operational output), so
 # no severity is mapped and records carry no severityText. Millisecond precision
 # is dropped: the ':'-separated milliseconds cannot be expressed in the

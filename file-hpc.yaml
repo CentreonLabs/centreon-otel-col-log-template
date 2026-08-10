@@ -1,7 +1,9 @@
 # Copyright 2026-Present Centreon.
 # SPDX-License-Identifier: AGPL-3.0-or-later
 
-# High-performance-cluster (HPC) log file.
+# Title: HPC cluster
+# Description: The HPC cluster (mmcs) node event log.
+#
 # The source has no severity field: the fourth column is an event category (e.g.
 # 'temperature', 'status'), not a level, and tokens like 'critical'/'warning'
 # appear only inside message bodies (temperature readings), so no severity is
