@@ -1,7 +1,10 @@
 # Copyright 2026-Present Centreon.
 # SPDX-License-Identifier: AGPL-3.0-or-later
 
-# Thunderbird supercomputer log file.
+# Title: Thunderbird
+# Description: The Thunderbird supercomputer centralized syslog (alert label,
+#   epoch and origin-host prefix).
+#
 # The format carries no severity field, so no severity is mapped (none is
 # synthesized from message keywords) and records arrive with severity unset. The
 # leading column is the alert-category label ('-' = benign); it is matched but

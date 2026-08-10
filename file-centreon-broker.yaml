@@ -1,6 +1,9 @@
 # Copyright 2025-Present Centreon.
 # SPDX-License-Identifier: AGPL-3.0-or-later
 
+# Title: Centreon Broker
+# Description: The log files of Centreon Broker.
+
 receivers:
   filelog/centreon-broker:
     include:

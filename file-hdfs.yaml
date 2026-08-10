@@ -1,7 +1,10 @@
 # Copyright 2026-Present Centreon.
 # SPDX-License-Identifier: AGPL-3.0-or-later
 
-# Hadoop HDFS log file (legacy 'yyMMdd HHmmss' format).
+# Title: HDFS
+# Description: The legacy Hadoop HDFS DataNode/NameNode log files, in the
+#   `yyMMdd HHmmss` format.
+#
 # Only the INFO and WARN severities are mapped, the ones observed in the
 # reference logs. Timestamps carry no UTC offset and are interpreted as UTC. The
 # include glob assumes the common /var/log/hadoop-hdfs installation path.

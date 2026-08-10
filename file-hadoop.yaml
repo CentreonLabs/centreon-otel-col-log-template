@@ -1,7 +1,10 @@
 # Copyright 2026-Present Centreon.
 # SPDX-License-Identifier: AGPL-3.0-or-later
 
-# Apache Hadoop Log4j-style log files.
+# Title: Hadoop
+# Description: The Apache Hadoop Log4j-style log files (ResourceManager,
+#   NodeManager, ...).
+#
 # The include glob assumes Hadoop logs live under /var/log/hadoop. The reference
 # logs contain one complete timestamped record per line and no stack-trace
 # continuation lines, so multiline recombination is not enabled.

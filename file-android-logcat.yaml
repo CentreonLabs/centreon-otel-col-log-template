@@ -1,7 +1,9 @@
 # Copyright 2026-Present Centreon.
 # SPDX-License-Identifier: AGPL-3.0-or-later
 
-# Android logcat output in 'threadtime' format.
+# Title: Android logcat
+# Description: Android logcat output in `threadtime` format.
+#
 # The include path is an assumed location: adjust it to wherever logcat output
 # is persisted on the target host. Timestamps carry no year (the collector fills
 # in the current year, so January lines read from a December file are mis-dated)

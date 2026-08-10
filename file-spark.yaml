@@ -1,7 +1,9 @@
 # Copyright 2026-Present Centreon.
 # SPDX-License-Identifier: AGPL-3.0-or-later
 
-# Apache Spark log files.
+# Title: Spark
+# Description: The Apache Spark log files.
+#
 # The include path is inferred, adjust it to the Spark log directory on the
 # target host. Timestamps carry no UTC offset and are interpreted as UTC.
 

@@ -1,6 +1,10 @@
 # Copyright 2025-Present Centreon.
 # SPDX-License-Identifier: AGPL-3.0-or-later
 
+# Title: Linux messages
+# Description: The syslog system log file (`/var/log/messages`). The emitting
+#   process name becomes the service name.
+
 receivers:
   filelog/messages:
     include:

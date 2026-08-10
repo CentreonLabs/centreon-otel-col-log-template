@@ -1,7 +1,10 @@
 # Copyright 2026-Present Centreon.
 # SPDX-License-Identifier: AGPL-3.0-or-later
 
-# OpenStack Nova log files.
+# Title: OpenStack Nova
+# Description: The OpenStack Nova log files (api, compute, scheduler),
+#   including WSGI access lines.
+#
 # Only the INFO and WARNING severity tokens are mapped, the ones observed in the
 # reference logs; the other OpenStack levels (DEBUG, ERROR, CRITICAL, AUDIT,
 # TRACE) surface without a severity until the mapping is extended. The include

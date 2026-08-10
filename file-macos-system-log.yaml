@@ -1,7 +1,9 @@
 # Copyright 2026-Present Centreon.
 # SPDX-License-Identifier: AGPL-3.0-or-later
 
-# macOS system log (BSD syslog format).
+# Title: macOS system log
+# Description: The macOS `/var/log/system.log` in BSD syslog framing.
+#
 # The format carries no severity token, so no severity is mapped (severity is
 # never synthesized from body keywords). Timestamps have no year (the collector
 # fills in the current year) and no UTC offset (assumed UTC). Lines without a
